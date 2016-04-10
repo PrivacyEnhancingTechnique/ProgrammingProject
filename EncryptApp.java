@@ -20,6 +20,8 @@ public class EncryptApp {
         main.buttonPanel = new JPanel();
         main.buttonPanel.add(main.textArea);
         main.buttonPanel.add(main.openButton);
+        ButtonGroup bg1 = new ButtonGroup( );
+        ButtonGroup bg2 = new ButtonGroup( );
 
         buttonPanel2 = new JPanel();
         buttonPanel2.setLayout(new MigLayout());
@@ -30,6 +32,8 @@ public class EncryptApp {
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
         buttonPanel2.add(main.googleDrive);
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
+        bg1.add(main.yesGoogle);
+        bg1.add(main.noGoogle);
         buttonPanel2.add(main.yesGoogle);
         buttonPanel2.add(main.noGoogle);
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
@@ -42,6 +46,8 @@ public class EncryptApp {
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
         buttonPanel2.add(main.dropBox);
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
+        bg2.add(main.yesDropbox);
+        bg2.add(main.noDropbox);
         buttonPanel2.add(main.yesDropbox);
         buttonPanel2.add(main.noDropbox);
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
