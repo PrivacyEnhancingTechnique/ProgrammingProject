@@ -1,3 +1,4 @@
+package cs898ABProject;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -44,11 +45,9 @@ public class EncryptApp {
         buttonPanel2.add(main.yesDropbox);
         buttonPanel2.add(main.noDropbox);
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.userName2);
-        buttonPanel2.add(main.userNameTextArea2);
+        buttonPanel2.add(main.appKeyDropBox);
+        buttonPanel2.add(main.appKeyDropBoxText);
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.passWord2);
-        buttonPanel2.add(main.passWordTextArea2);
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
         buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
         buttonPanel2.add(main.uploadButton, BorderLayout.CENTER);
