@@ -1,8 +1,20 @@
+package cs898ABProject;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxEntry;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.DbxWriteMode;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
@@ -24,10 +36,8 @@ public class MainInterface extends JPanel
 	 JTextArea passWordTextArea = new JTextArea("********");
 	 JLabel passWord = new JLabel("Password");
 	 JLabel dropBox = new JLabel("Dropbox Account?");
-	 JLabel userName2 = new JLabel("Username");
-	 JTextArea userNameTextArea2 = new JTextArea("me@yahoo.com");
-	 JTextArea passWordTextArea2 = new JTextArea("*****************");
-	 JLabel passWord2 = new JLabel("Password");
+	 JLabel appKeyDropBox = new JLabel("App Key");
+	 JTextArea appKeyDropBoxText = new JTextArea("");
 	 JButton uploadButton = new JButton ("Upload");
 	 SpinnerModel model = new SpinnerNumberModel(1, 0, 20, 1);
 	 JSpinner chunkSize = new JSpinner(model);
@@ -43,6 +53,7 @@ public class MainInterface extends JPanel
 		 
 		//create button
 		 openButton.addActionListener(this); 
+                  uploadButton.addActionListener(this); 
 		 menu1.addActionListener(this);
 		 menu2.addActionListener(this);
 		
@@ -70,17 +81,16 @@ public class MainInterface extends JPanel
 	     userNameTextArea.setBackground(new Color(250,250,250));
 	     passWordTextArea.setPreferredSize(new Dimension(200, 20));
 	     passWordTextArea.setBackground(new Color(250,250,250));
-	     userNameTextArea2.setPreferredSize(new Dimension(200, 20));
-	     userNameTextArea2.setBackground(new Color(250,250,250));
-	     passWordTextArea2.setPreferredSize(new Dimension(200, 20));
-	     passWordTextArea2.setBackground(new Color(250,250,250));
+	     appKeyDropBoxText.setPreferredSize(new Dimension(200, 20));
+	     appKeyDropBoxText.setBackground(new Color(250,250,250));
+	   
 	     
 	     //value chooser
 	     chunkSize.setBounds(0, 0, 10, 10);
 	 }
     
 	 @Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e)  {
 			//Handle open button action.
 	        if (e.getSource() == openButton) {
 	            int returnVal = fc.showOpenDialog(MainInterface.this);
@@ -98,6 +108,16 @@ public class MainInterface extends JPanel
 			
 		}
 	    
+                if (e.getSource() == uploadButton) {
+                    try {
+                        uploadToDropbox();
+                    } catch (IOException ex) {
+                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (DbxException ex) {
+                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
 	    if (e.getSource() == menu1) {
 
 	         //Display the window.
@@ -110,5 +130,44 @@ public class MainInterface extends JPanel
 	    }
 	    
 		}
-	
+
+   public void uploadToDropbox() throws IOException, DbxException{
+        DbxClient client = authenticateDropBox();
+        
+        //Upload file
+        File inputFile = new File(openButton.getText());
+        FileInputStream inputStream = new FileInputStream(inputFile);
+        try {
+            DbxEntry.File uploadedFile = client.uploadFile("/Project_Proposal.docx",
+                DbxWriteMode.add(), inputFile.length(), inputStream);
+            System.out.println("Uploaded: " + uploadedFile.toString());
+        } finally {
+            inputStream.close();
+        }
+   }
+   
+   public DbxClient authenticateDropBox() throws DbxException {
+       DbxRequestConfig config = new DbxRequestConfig(
+            "CS898AB Project", Locale.getDefault().toString());
+        //bypass confirm method
+        String accessToken = appKeyDropBoxText.getText();
+                //"FFrQLoDw4SAAAAAAAAAAJOMwQojXyvwIxZnFwMtWu9nrSyn_8kO7AgdX14_dniwN";
+
+        DbxClient client = new DbxClient(config, accessToken);
+
+        System.out.println("Linked account: " + client.getAccountInfo().displayName);
+        return client;
+   }
+   
+   public void downloadFromDropBox() throws IOException, DbxException {
+       DbxClient client = authenticateDropBox();
+       FileOutputStream outputStream = new FileOutputStream("/Users/sreymoct/class/cs898AB/Copy_Project_Proposal.docx");
+        try {
+            DbxEntry.File downloadedFile = client.getFile("/Project_Proposal.docx", null,
+                outputStream);
+            System.out.println("Metadata: " + downloadedFile.toString());
+        } finally {
+            outputStream.close();
+        }
+   }
 }
