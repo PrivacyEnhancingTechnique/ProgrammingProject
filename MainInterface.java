@@ -1,4 +1,3 @@
-package cs898ABProject;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,8 +19,9 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class MainInterface extends JPanel 
 					implements ActionListener {
+	public static String fileName;
 
-	 JPanel buttonPanel;
+	JPanel buttonPanel;
 	 JFrame frame = new JFrame("Secure Cloud Storage App");
      JMenuBar greenMenuBar = new JMenuBar();
      JMenu menu1 = new JMenu("Upload & Encrypt");
@@ -88,18 +88,28 @@ public class MainInterface extends JPanel
 	     //value chooser
 	     chunkSize.setBounds(0, 0, 10, 10);
 	 }
-    
+
+		
+	 public static String getFileName() {
+		return fileName;
+	}
+
+	public static void setFileName(String fileName) {
+		MainInterface.fileName = fileName;
+	}
+	
 	 @Override
 		public void actionPerformed(ActionEvent e)  {
 			//Handle open button action.
-	        if (e.getSource() == openButton) {
+	         if (e.getSource() == openButton) {
 	            int returnVal = fc.showOpenDialog(MainInterface.this);
 
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
 	                File file = fc.getSelectedFile();
 	                //This is where a real application would open the file.
-	                System.out.println("Opening: "+fc.getCurrentDirectory() + file.getName() + "." );
-	                textArea.setText(fc.getCurrentDirectory() + file.getName());
+	                System.out.println("Opening: "+fc.getCurrentDirectory() + file.getName() );
+	                textArea.setText(fc.getCurrentDirectory() + "\\" + file.getName());
+	                setFileName(fc.getCurrentDirectory() + "\\" +file.getName());
 	            } else {
 	            	System.out.println("Open command cancelled by user.");
 	            }
