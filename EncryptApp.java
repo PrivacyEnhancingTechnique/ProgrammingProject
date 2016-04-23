@@ -1,73 +1,210 @@
-package cs898ABProject;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxEntry;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.DbxWriteMode;
 import net.miginfocom.swing.MigLayout;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.*;
 
-public class EncryptApp {
+@SuppressWarnings("serial")
+public class EncryptApp extends JPanel 
+					implements ActionListener {
+	public static String fileName;
+	private static JPanel encryptPanel;
 	
-	private static JPanel buttonPanel2;
-	
-	public static void main (String[]args) {
-		MainInterface main = new MainInterface();
-	    
-	    //create menus
-        main.greenMenuBar.add(main.menu1);
-        main.greenMenuBar.add(main.menu2);
+	 JMenuBar greenMenuBar = new JMenuBar();
+	 JButton openButton = new JButton("Select a File...");
+	 JFileChooser fc = new JFileChooser(); 
+     JTextArea textArea = new JTextArea();
+	 JLabel numberOfChunks = new JLabel("File Split Count");
+	 JLabel googleDrive = new JLabel("Google Drive Account?");
+	 JLabel userName = new JLabel("Username");
+	 JTextArea userNameTextArea = new JTextArea("me@gmail.com");
+	 JTextArea passWordTextArea = new JTextArea("********");
+	 JLabel passWord = new JLabel("Password");
+	 JLabel dropBox = new JLabel("Dropbox Account?");
+	 JLabel appKeyDropBox = new JLabel("App Key");
+	 JTextArea appKeyDropBoxText = new JTextArea("");
+	 JButton uploadButton = new JButton ("Upload");
+	 SpinnerModel model = new SpinnerNumberModel(1, 0, 20, 1);
+	 JSpinner chunkSize = new JSpinner(model);
+	 JRadioButton yesGoogle = new JRadioButton("Yes");
+	 JRadioButton noGoogle = new JRadioButton("No");
+	 JRadioButton yesDropbox = new JRadioButton("Yes");
+	 JRadioButton noDropbox = new JRadioButton("No");
+     JLabel spacer;
+     
+	 public EncryptApp() {
+		 		 
+		//create button
+		 openButton.addActionListener(this); 
+         uploadButton.addActionListener(this); 
+		
+		//Create the menu bar.  Make it have a green background.
+	     greenMenuBar.setOpaque(true);
+	     greenMenuBar.setPreferredSize(new Dimension(200, 40));
+		 
+		 //Create a label
+		 numberOfChunks.setOpaque(true);
+		 googleDrive.setOpaque(true);
+		 dropBox.setOpaque(true);
+		 
+		 //TextArea
+		 textArea.setPreferredSize(new Dimension(300, 20));
+	     textArea.setBackground(new Color(250,250,250));
+	     userNameTextArea.setPreferredSize(new Dimension(200, 20));
+	     userNameTextArea.setBackground(new Color(250,250,250));
+	     passWordTextArea.setPreferredSize(new Dimension(200, 20));
+	     passWordTextArea.setBackground(new Color(250,250,250));
+	     appKeyDropBoxText.setPreferredSize(new Dimension(200, 20));
+	     appKeyDropBoxText.setBackground(new Color(250,250,250));
+	   
+	     
+	     //value chooser
+	     chunkSize.setBounds(0, 0, 10, 10);
+	 }
 
-        main.buttonPanel = new JPanel();
-        main.buttonPanel.add(main.textArea);
-        main.buttonPanel.add(main.openButton);
-        ButtonGroup bg1 = new ButtonGroup( );
-        ButtonGroup bg2 = new ButtonGroup( );
-
-        buttonPanel2 = new JPanel();
-        buttonPanel2.setLayout(new MigLayout());
-        buttonPanel2.setBackground(new Color(248, 213, 131));
-        buttonPanel2.add(main.spacer =  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.numberOfChunks);
-        buttonPanel2.add(main.chunkSize);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.googleDrive);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        bg1.add(main.yesGoogle);
-        bg1.add(main.noGoogle);
-        buttonPanel2.add(main.yesGoogle);
-        buttonPanel2.add(main.noGoogle);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.userName);
-        buttonPanel2.add(main.userNameTextArea);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.passWord);
-        buttonPanel2.add(main.passWordTextArea);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.dropBox);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        bg2.add(main.yesDropbox);
-        bg2.add(main.noDropbox);
-        buttonPanel2.add(main.yesDropbox);
-        buttonPanel2.add(main.noDropbox);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.appKeyDropBox);
-        buttonPanel2.add(main.appKeyDropBoxText);
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.spacer=  new JLabel(" "), "span, grow");
-        buttonPanel2.add(main.uploadButton, BorderLayout.CENTER);
-        
-        //Set the menu bar and add the label to the content pane.
-        main.frame.setJMenuBar(main.greenMenuBar);
-
-    	main.frame.add(main.buttonPanel, BorderLayout.PAGE_START);
-        main.frame.getContentPane().add(buttonPanel2);
-      
-        //Display the window.
-	    main.frame.pack();
-	    main.frame.setVisible(true);
+		
+	 public JPanel loadEncryptPage() {
+		 
+		    JPanel buttonPanel = new JPanel();
+	        JPanel tabPanel = new JPanel();
+	        encryptPanel = new JPanel();
+	        
+		    //create menus
+	        encryptPanel.setLayout( null );        
+	        
+	        tabPanel.setLayout( new BorderLayout() );
+	        buttonPanel.add(textArea);
+	        buttonPanel.add(openButton);
+	        ButtonGroup bg1 = new ButtonGroup( );
+	        ButtonGroup bg2 = new ButtonGroup( );
+	        
+	        encryptPanel.add(buttonPanel);
+	        encryptPanel.setLayout(new MigLayout());
+	        encryptPanel.setBackground(new Color(248, 213, 131));
+	        encryptPanel.add(spacer =  new JLabel(" "), "span, grow");
+	        encryptPanel.add(numberOfChunks);
+	        encryptPanel.add(chunkSize);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(googleDrive);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        bg1.add(yesGoogle);
+	        bg1.add(noGoogle);
+	        encryptPanel.add(yesGoogle);
+	        encryptPanel.add(noGoogle);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(userName);
+	        encryptPanel.add(userNameTextArea);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(passWord);
+	        encryptPanel.add(passWordTextArea);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(dropBox);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        bg2.add(yesDropbox);
+	        bg2.add(noDropbox);
+	        encryptPanel.add(yesDropbox);
+	        encryptPanel.add(noDropbox);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(appKeyDropBox);
+	        encryptPanel.add(appKeyDropBoxText);
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(uploadButton, BorderLayout.CENTER);     
+	        
+	        return encryptPanel;
+	 }
+	 
+	 public static String getFileName() {
+		return fileName;
 	}
 
+	public static void setFileName(String fileName) {
+		EncryptApp.fileName = fileName;
+	}
 	
+	 @Override
+		public void actionPerformed(ActionEvent e)  {
+			//Handle open button action.
+	         if (e.getSource() == openButton) {
+	            int returnVal = fc.showOpenDialog(EncryptApp.this);
+
+	            if (returnVal == JFileChooser.APPROVE_OPTION) {
+	                File file = fc.getSelectedFile();
+	                //This is where a real application would open the file.
+	                System.out.println("Opening: "+fc.getCurrentDirectory() + file.getName() );
+	                textArea.setText(fc.getCurrentDirectory() + "\\" + file.getName());
+	                setFileName(fc.getCurrentDirectory() + "\\" +file.getName());
+	            } else {
+	            	System.out.println("Open command cancelled by user.");
+	            }
+	        //    log.setCaretPosition(log.getDocument().getLength());
+	// TODO Auto-generated method stub
+			
+		}
+	    
+                if (e.getSource() == uploadButton) {
+                    try {
+                        uploadToDropbox();
+                    } catch (IOException ex) {
+                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (DbxException ex) {
+                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+	    
+		}
+
+   public void uploadToDropbox() throws IOException, DbxException{
+        DbxClient client = authenticateDropBox();
+        
+        //Upload file
+        File inputFile = new File(openButton.getText());
+        FileInputStream inputStream = new FileInputStream(inputFile);
+        try {
+            DbxEntry.File uploadedFile = client.uploadFile("/Project_Proposal.docx",
+                DbxWriteMode.add(), inputFile.length(), inputStream);
+            System.out.println("Uploaded: " + uploadedFile.toString());
+        } finally {
+            inputStream.close();
+        }
+   }
+   
+   public DbxClient authenticateDropBox() throws DbxException {
+       DbxRequestConfig config = new DbxRequestConfig(
+            "CS898AB Project", Locale.getDefault().toString());
+        //bypass confirm method
+        String accessToken = appKeyDropBoxText.getText();
+                //"FFrQLoDw4SAAAAAAAAAAJOMwQojXyvwIxZnFwMtWu9nrSyn_8kO7AgdX14_dniwN";
+
+        DbxClient client = new DbxClient(config, accessToken);
+
+        System.out.println("Linked account: " + client.getAccountInfo().displayName);
+        return client;
+   }
+   
+   public void downloadFromDropBox() throws IOException, DbxException {
+       DbxClient client = authenticateDropBox();
+       FileOutputStream outputStream = new FileOutputStream("/Users/sreymoct/class/cs898AB/Copy_Project_Proposal.docx");
+        try {
+            DbxEntry.File downloadedFile = client.getFile("/Project_Proposal.docx", null,
+                outputStream);
+            System.out.println("Metadata: " + downloadedFile.toString());
+        } finally {
+            outputStream.close();
+        }
+   }
 }
