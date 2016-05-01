@@ -11,9 +11,13 @@ import net.miginfocom.swing.MigLayout;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 
 @SuppressWarnings("serial")
@@ -34,6 +38,8 @@ public class EncryptApp extends JPanel
 	 JLabel passWord = new JLabel("Password");
 	 JLabel dropBox = new JLabel("Dropbox Account?");
 	 JLabel appKeyDropBox = new JLabel("App Key");
+	 JLabel dropboxDirLabel = new JLabel("Upload Location");
+	 JTextArea dropboxDirText = new JTextArea("");
 	 JTextArea appKeyDropBoxText = new JTextArea("");
 	 JButton uploadButton = new JButton ("Upload");
 	 SpinnerModel model = new SpinnerNumberModel(1, 0, 20, 1);
@@ -68,7 +74,8 @@ public class EncryptApp extends JPanel
 	     passWordTextArea.setBackground(new Color(250,250,250));
 	     appKeyDropBoxText.setPreferredSize(new Dimension(200, 20));
 	     appKeyDropBoxText.setBackground(new Color(250,250,250));
-	   
+	     dropboxDirText.setPreferredSize(new Dimension(200, 20)); 
+	     dropboxDirText.setBackground(new Color(250,250,250));
 	     
 	     //value chooser
 	     chunkSize.setBounds(0, 0, 10, 10);
@@ -121,6 +128,8 @@ public class EncryptApp extends JPanel
 	        encryptPanel.add(appKeyDropBox);
 	        encryptPanel.add(appKeyDropBoxText);
 	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        encryptPanel.add(dropboxDirLabel);
+	        encryptPanel.add(dropboxDirText);
 	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        encryptPanel.add(uploadButton, BorderLayout.CENTER);     
@@ -145,9 +154,18 @@ public class EncryptApp extends JPanel
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
 	                File file = fc.getSelectedFile();
 	                //This is where a real application would open the file.
-	                System.out.println("Opening: "+fc.getCurrentDirectory() + file.getName() );
+	                System.out.println("Opening: "+fc.getCurrentDirectory()+ "\\" + file.getName() );
 	                textArea.setText(fc.getCurrentDirectory() + "\\" + file.getName());
 	                setFileName(fc.getCurrentDirectory() + "\\" +file.getName());
+	                
+	                try {
+						RSAEncryption encrpt = new RSAEncryption();
+						encrpt.encryptFile("me");
+					} catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	                
 	            } else {
 	            	System.out.println("Open command cancelled by user.");
 	            }
