@@ -211,6 +211,16 @@ public class DecryptApp  extends JPanel {
        
    }
    
+   public static String getFileDirectory(String directory) {
+        //Add appropriate slash if the directory does not end with one
+        if (directory != "/"){
+            if (directory.contains("/") && !directory.endsWith("/")) {
+                directory += "//";
+            }
+        }
+        return directory;
+    }
+    
    public static ArrayList<String> download(String file, String localDirectory, String cloudDirectory, DbxClient client) 
             throws IOException, DbxException {
         ArrayList<String> subFileList = new ArrayList<String>();
