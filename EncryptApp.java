@@ -158,13 +158,13 @@ public class EncryptApp extends JPanel
 	                textArea.setText(fc.getCurrentDirectory() + "\\" + file.getName());
 	                setFileName(fc.getCurrentDirectory() + "\\" +file.getName());
 	                
-	                try {
-						RSAEncryption encrpt = new RSAEncryption();
+	                /*try {
+						EncryptDecrypt encrpt = new EncryptDecrypt();
 						encrpt.encryptFile("me");
 					} catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}
+					}*/
 	                
 	            } else {
 	            	System.out.println("Open command cancelled by user.");
