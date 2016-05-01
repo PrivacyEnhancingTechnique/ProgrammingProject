@@ -1,3 +1,11 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package cs898ABProject;
+
+import java.util.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,9 +15,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
 
 
-public class EncryptDecrypt {
+public class EncryptDecrypt  {
 	KeyGenerator keyGen;
 	SecretKey encrptionKey;
 	
@@ -34,10 +43,13 @@ public class EncryptDecrypt {
 		}
 	}
 	
-	public void decryptFile(ArrayList <String> fileNames) {
+	public void decryptFile(ArrayList <String> fileNames, String key) {
 		//decrypt file code
 		File outFile = new File ("decrypted.txt");
-		
+                byte[] encodedKey = Base64.getDecoder().decode(key);
+		this.encrptionKey=new SecretKeySpec(encodedKey,0,encodedKey.length,"DES");
+                
+                
 		for(int i=0; i<fileNames.size();i++) {
 			File file = new File (fileNames.get(i));
 			encryptDecrypt(Cipher.DECRYPT_MODE,file,outFile);
@@ -71,4 +83,3 @@ public class EncryptDecrypt {
     }
 
 }
-
