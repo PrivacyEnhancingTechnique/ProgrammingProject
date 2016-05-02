@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package cs898ABProject;
 
 import java.util.*;
 import java.io.File;
@@ -16,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 
 
 public class EncryptDecrypt  {
@@ -35,6 +30,7 @@ public class EncryptDecrypt  {
 			File outFile = new File (fileName);
 			encryptDecrypt(Cipher.ENCRYPT_MODE,file,outFile);
 			System.out.println(this.encrptionKey);
+			System.out.println(Base64.getEncoder().encodeToString(this.encrptionKey.getEncoded()));
 			//decryptFile();
 		}
 		else {
@@ -46,12 +42,18 @@ public class EncryptDecrypt  {
 	public void decryptFile(ArrayList <String> fileNames, String key) {
 		//decrypt file code
 		File outFile = new File ("decrypted.txt");
-                byte[] encodedKey = Base64.getDecoder().decode(key);
+		 System.out.println(key);
+	// String encoded = DatatypeConverter.printBase64Binary(key.getBytes());
+	// System.out.println(encoded); 
+       byte[] encodedKey = Base64.getDecoder().decode(key);
+       System.out.println(encodedKey);  
+       // byte[] encodedKey = DatatypeConverter.parseHexBinary(key);
 		this.encrptionKey=new SecretKeySpec(encodedKey,0,encodedKey.length,"DES");
-                
+		System.out.println(this.encrptionKey);       
                 
 		for(int i=0; i<fileNames.size();i++) {
 			File file = new File (fileNames.get(i));
+			System.out.println("Decrypt: "+fileNames.get(i));
 			encryptDecrypt(Cipher.DECRYPT_MODE,file,outFile);
 		}
 		
