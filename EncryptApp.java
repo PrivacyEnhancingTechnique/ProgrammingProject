@@ -1,4 +1,3 @@
-package cs898ABProject;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,8 +8,6 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWriteMode;
-import static cs898ABProject.Authenticate.download;
-import static cs898ABProject.Authenticate.getFileDirectory;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import net.miginfocom.swing.MigLayout;
