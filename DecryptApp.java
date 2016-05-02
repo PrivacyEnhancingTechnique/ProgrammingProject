@@ -1,21 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package cs898ABProject;
 
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
-import static cs898ABProject.Authenticate.download;
-import static cs898ABProject.Authenticate.getFileDirectory;
-import static cs898ABProject.EncryptApp.setFileName;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,11 +31,12 @@ import javax.swing.SpinnerNumberModel;
 
 import net.miginfocom.swing.MigLayout;
 
-//FFrQLoDw4SAAAAAAAAAAJOMwQojXyvwIxZnFwMtWu9nrSyn_8kO7AgdX14_dniwN
-public class DecryptApp  extends JPanel {
+public class DecryptApp  extends JPanel implements ActionListener{
 	
 	 JPanel decryptPanel = new JPanel();
          JTextArea textArea = new JTextArea();
+         JTextArea folderLocationText = new JTextArea("");
+         JLabel folderLocation = new JLabel("Dropbox Folder Location");
          JButton openButton = new JButton("Select a File...");
 	 //JFileChooser fc = new JFileChooser(); 
          JLabel key = new JLabel("Decryption Key");
@@ -71,26 +64,29 @@ public class DecryptApp  extends JPanel {
     
 	 public DecryptApp() {
 
+		 downloadButton.addActionListener(this); 
 		 
 		 //Create a label
 		 googleDrive.setOpaque(true);
 		 dropBox.setOpaque(true);
 		 
 		 //TextArea
-                 keyText.setPreferredSize(new Dimension(300, 20));
-                 keyText.setBackground(new Color(250,250,250));
-                 dowloadLocationText.setPreferredSize(new Dimension(300, 20));
-                 dowloadLocationText.setBackground(new Color(250,250,250));
-                 fileDirTextArea.setPreferredSize(new Dimension(300, 20));
-                 fileDirTextArea.setBackground(new Color(250,250,250));
-		 textArea.setPreferredSize(new Dimension(300, 20));
-                textArea.setBackground(new Color(250,250,250));
-                userNameTextArea.setPreferredSize(new Dimension(200, 20));
-                userNameTextArea.setBackground(new Color(250,250,250));
-                passWordTextArea.setPreferredSize(new Dimension(200, 20));
-                passWordTextArea.setBackground(new Color(250,250,250));
-                appKeyDropBoxText.setPreferredSize(new Dimension(200, 20));
-                appKeyDropBoxText.setBackground(new Color(250,250,250));
+		 folderLocationText.setPreferredSize(new Dimension(300, 20));
+		 folderLocationText.setBackground(new Color(250,250,250));
+         keyText.setPreferredSize(new Dimension(300, 20));
+         keyText.setBackground(new Color(250,250,250));
+         dowloadLocationText.setPreferredSize(new Dimension(300, 20));
+         dowloadLocationText.setBackground(new Color(250,250,250));
+         fileDirTextArea.setPreferredSize(new Dimension(300, 20));
+         fileDirTextArea.setBackground(new Color(250,250,250));
+         textArea.setPreferredSize(new Dimension(300, 20));
+        textArea.setBackground(new Color(250,250,250));
+        userNameTextArea.setPreferredSize(new Dimension(200, 20));
+        userNameTextArea.setBackground(new Color(250,250,250));
+        passWordTextArea.setPreferredSize(new Dimension(200, 20));
+        passWordTextArea.setBackground(new Color(250,250,250));
+        appKeyDropBoxText.setPreferredSize(new Dimension(200, 20));
+        appKeyDropBoxText.setBackground(new Color(250,250,250));
 	   
 	     
 	     //value chooser
@@ -108,7 +104,10 @@ public class DecryptApp  extends JPanel {
 	        ButtonGroup bg1 = new ButtonGroup( );
 	        ButtonGroup bg2 = new ButtonGroup( );
 	        
-               
+	        decryptPanel.add(folderLocation);
+		    decryptPanel.add(folderLocationText);  
+		    decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+		    decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        decryptPanel.add(fileToDecryptName);
 		    decryptPanel.add(textArea);
 		    decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
@@ -170,6 +169,7 @@ public class DecryptApp  extends JPanel {
 		}*/
          if (e.getSource() == downloadButton) {
                     try {
+                    	System.out.println("Hi");
                         downloadFromDropBox();
                     } catch (IOException ex) {
                         Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
@@ -192,16 +192,17 @@ public class DecryptApp  extends JPanel {
    }
    
    public void downloadFromDropBox() throws IOException, DbxException {
+
+   	System.out.println("Hi54");
        EncryptDecrypt decryptObj; 
        DbxClient client = authenticateDropBox();
-    
        //Download
-       ArrayList<String> subFileList = download(textArea.getText(), fileDirTextArea.getText(), textArea.getText(), client);
+       ArrayList<String> subFileList = download(textArea.getText(), fileDirTextArea.getText(), folderLocationText.getText(), client);
        
        //Decrypt
         try {
             decryptObj = new EncryptDecrypt();
-            decryptObj.decryptFile(subFileList, String keyText.getText());
+            decryptObj.decryptFile(subFileList, keyText.getText());
         } catch (NoSuchAlgorithmException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -212,6 +213,7 @@ public class DecryptApp  extends JPanel {
        
    }
    
+   
    public static String getFileDirectory(String directory) {
         //Add appropriate slash if the directory does not end with one
         if (directory != "/"){
@@ -221,7 +223,7 @@ public class DecryptApp  extends JPanel {
         }
         return directory;
     }
-    
+   
    public static ArrayList<String> download(String file, String localDirectory, String cloudDirectory, DbxClient client) 
             throws IOException, DbxException {
         ArrayList<String> subFileList = new ArrayList<String>();
