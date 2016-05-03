@@ -266,8 +266,24 @@ public class DecryptApp  extends JPanel implements ActionListener{
         
         //Merge
         mergeFile(subFileList, textArea.getText(), dowloadLocationText.getText());
+        
+        //Delete
+        deleteFile(subFileList, dowloadLocationText.getText());
        
    }
+   
+   public static void deleteFile(ArrayList<String> subFiles, String directory) {
+        for (int index = 0; index < subFiles.size(); index++) {
+            String filePath = directory + subFiles.get(index);
+            System.out.print(filePath);
+            File file = new File(filePath);
+            if(file.delete()){
+                System.out.println(file.getName() + " is deleted successfully!");
+            }else{
+                System.out.println("Failed to delete file.");
+            }
+        }
+    }
    
    public static void mergeFile(ArrayList<String> subFiles, String baseFile, String directory) throws IOException {
         String baseFileNameAndPath = getFileDirectory(directory) + "copy_" + baseFile;
