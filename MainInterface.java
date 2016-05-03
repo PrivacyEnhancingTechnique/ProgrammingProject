@@ -1,6 +1,7 @@
-
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
+
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -10,8 +11,10 @@ public class MainInterface  {
 	private static JPanel tabPanel=new JPanel();
 	
 	public static void main (String[]args) {
-		JFrame frame = new JFrame("Secure Cloud Storage App");
+		JFrame frame = new JFrame("Secured Cloud");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		//JDialog popWindow = new JDialog ();
 		 
 		JTabbedPane tabbedPane  = new JTabbedPane();
 		EncryptApp encryptInterface = new EncryptApp();
