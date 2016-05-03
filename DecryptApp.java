@@ -265,11 +265,26 @@ public class DecryptApp  extends JPanel implements ActionListener{
         }
         
         //Merge
-        
+        mergeFile(subFileList, textArea.getText(), dowloadLocationText.getText());
        
    }
    
-   
+   public static void mergeFile(ArrayList<String> subFiles, String baseFile, String directory) throws IOException {
+        String baseFileNameAndPath = getFileDirectory(directory) + "copy_" + baseFile;
+        BufferedOutputStream outputFile = new BufferedOutputStream(new FileOutputStream(baseFileNameAndPath));
+        for (int subFileIndex = 0; subFileIndex < subFiles.size(); subFileIndex++) {
+            BufferedInputStream inputFile = new BufferedInputStream(
+                    new FileInputStream(subFiles.get(subFileIndex)));
+
+            int b;
+            while ( (b = inputFile.read()) != -1 )
+                    outputFile.write(b);
+
+            inputFile.close();
+        }
+            outputFile.close();
+    }
+    
    public static String getFileDirectory(String directory) {
         //Add appropriate slash if the directory does not end with one
         if (directory != "/"){
