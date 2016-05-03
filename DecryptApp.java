@@ -8,21 +8,20 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.NoSuchPaddingException;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -32,26 +31,28 @@ import javax.swing.SpinnerNumberModel;
 import net.miginfocom.swing.MigLayout;
 
 public class DecryptApp  extends JPanel implements ActionListener{
-	
+
+	 ButtonGroup bg1 = new ButtonGroup( );
+	 ButtonGroup bg2 = new ButtonGroup( );
 	 JPanel decryptPanel = new JPanel();
-         JTextArea textArea = new JTextArea();
-         JTextArea folderLocationText = new JTextArea("");
-         JLabel folderLocation = new JLabel("Dropbox Folder Location");
-         JButton openButton = new JButton("Select a File...");
+	 JLabel folderLocation = new JLabel("Drive Folder Location");
+	 JTextArea folderLocationText = new JTextArea("");
+	 JButton openButton = new JButton("Select a File...");
 	 //JFileChooser fc = new JFileChooser(); 
-         JLabel key = new JLabel("Decryption Key");
+	 JLabel key = new JLabel("Decryption Key");
 	 JTextArea keyText = new JTextArea("");
-         JLabel dowloadLocation = new JLabel("Download Location");
+	 JLabel dowloadLocation = new JLabel("Download Location");
 	 JTextArea dowloadLocationText = new JTextArea("");
-         JTextArea fileDirTextArea = new JTextArea();
-         JLabel fileToDecryptName = new JLabel("File Name");
+	 //JTextArea fileDirTextArea = new JTextArea();
+	 JLabel fileToDecryptName = new JLabel("File Name");
+	 JTextArea textArea = new JTextArea();
 	 JLabel googleDrive = new JLabel("Google Drive Account?");
-	 JLabel userName = new JLabel("Username");
-	 JTextArea userNameTextArea = new JTextArea("me@gmail.com");
-	 JTextArea passWordTextArea = new JTextArea("********");
-	 JLabel passWord = new JLabel("Password");
+	 JLabel googleDriveKey = new JLabel("Google Drive Token");
+	 JTextArea googleDriveKeyLabel = new JTextArea("");
+	 //JPasswordField passWordTextArea = new JPasswordField();
+	 //JLabel passWord = new JLabel("Password");
 	 JLabel dropBox = new JLabel("Dropbox Account?");
-	 JLabel appKeyDropBox = new JLabel("App Key");
+	 JLabel appKeyDropBox = new JLabel("Dropbox Token");
 	 JTextArea appKeyDropBoxText = new JTextArea("");
 	 JButton downloadButton = new JButton ("Download");
 	 SpinnerModel model = new SpinnerNumberModel(1, 0, 20, 1);
@@ -60,7 +61,7 @@ public class DecryptApp  extends JPanel implements ActionListener{
 	 JRadioButton noGoogle = new JRadioButton("No");
 	 JRadioButton yesDropbox = new JRadioButton("Yes");
 	 JRadioButton noDropbox = new JRadioButton("No");
-    JLabel spacer;
+     JLabel spacer;
     
 	 public DecryptApp() {
 
@@ -69,7 +70,13 @@ public class DecryptApp  extends JPanel implements ActionListener{
 		 //Create a label
 		 googleDrive.setOpaque(true);
 		 dropBox.setOpaque(true);
-		 
+		
+		//set radiobutton
+         yesGoogle.setActionCommand("Yes");
+         noGoogle.setActionCommand("No");
+         yesDropbox.setActionCommand("Yes");
+         noDropbox.setActionCommand("No");
+         
 		 //TextArea
 		 folderLocationText.setPreferredSize(new Dimension(300, 20));
 		 folderLocationText.setBackground(new Color(250,250,250));
@@ -77,14 +84,14 @@ public class DecryptApp  extends JPanel implements ActionListener{
          keyText.setBackground(new Color(250,250,250));
          dowloadLocationText.setPreferredSize(new Dimension(300, 20));
          dowloadLocationText.setBackground(new Color(250,250,250));
-         fileDirTextArea.setPreferredSize(new Dimension(300, 20));
-         fileDirTextArea.setBackground(new Color(250,250,250));
+        // fileDirTextArea.setPreferredSize(new Dimension(300, 20));
+         //fileDirTextArea.setBackground(new Color(250,250,250));
          textArea.setPreferredSize(new Dimension(300, 20));
-        textArea.setBackground(new Color(250,250,250));
-        userNameTextArea.setPreferredSize(new Dimension(200, 20));
-        userNameTextArea.setBackground(new Color(250,250,250));
-        passWordTextArea.setPreferredSize(new Dimension(200, 20));
-        passWordTextArea.setBackground(new Color(250,250,250));
+         textArea.setBackground(new Color(250,250,250));
+         googleDriveKeyLabel.setPreferredSize(new Dimension(200, 20));
+         googleDriveKeyLabel.setBackground(new Color(250,250,250));
+       // passWordTextArea.setPreferredSize(new Dimension(200, 20));
+        //passWordTextArea.setBackground(new Color(250,250,250));
         appKeyDropBoxText.setPreferredSize(new Dimension(200, 20));
         appKeyDropBoxText.setBackground(new Color(250,250,250));
 	   
@@ -100,20 +107,17 @@ public class DecryptApp  extends JPanel implements ActionListener{
     }
     
 	 public JPanel loadDecryptPage() {
-
-	        ButtonGroup bg1 = new ButtonGroup( );
-	        ButtonGroup bg2 = new ButtonGroup( );
 	        
+
+	        decryptPanel.setLayout(new MigLayout());
+	        decryptPanel.setBackground(new Color(248, 213, 131));
+	    	decryptPanel.setPreferredSize(new Dimension(700, 400));
 	        decryptPanel.add(folderLocation);
 		    decryptPanel.add(folderLocationText);  
-		    decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 		    decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        decryptPanel.add(fileToDecryptName);
 		    decryptPanel.add(textArea);
 		    decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-		    decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-	        decryptPanel.setLayout(new MigLayout());
-	        decryptPanel.setBackground(new Color(248, 213, 131));
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        decryptPanel.add(googleDrive);
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
@@ -122,11 +126,11 @@ public class DecryptApp  extends JPanel implements ActionListener{
 	        decryptPanel.add(yesGoogle);
 	        decryptPanel.add(noGoogle);
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-	        decryptPanel.add(userName);
-	        decryptPanel.add(userNameTextArea);
+	        decryptPanel.add(googleDriveKey);
+	        decryptPanel.add(googleDriveKeyLabel);
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-	        decryptPanel.add(passWord);
-	        decryptPanel.add(passWordTextArea);
+	       // decryptPanel.add(passWord);
+	        //decryptPanel.add(passWordTextArea);
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        decryptPanel.add(dropBox);
@@ -139,12 +143,14 @@ public class DecryptApp  extends JPanel implements ActionListener{
 	        decryptPanel.add(appKeyDropBox);
 	        decryptPanel.add(appKeyDropBoxText);
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-                decryptPanel.add(key);
+	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+            decryptPanel.add(key);
 	        decryptPanel.add(keyText);
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-                decryptPanel.add(dowloadLocation);
+            decryptPanel.add(dowloadLocation);
 	        decryptPanel.add(dowloadLocationText);
 	        decryptPanel.add(spacer=  new JLabel(" "), "span, grow");
+	        decryptPanel.add(spacer =  new JLabel(" "), "span, grow");
 	        decryptPanel.add(downloadButton, BorderLayout.CENTER); 
 	        
 	        return decryptPanel;
@@ -168,6 +174,13 @@ public class DecryptApp  extends JPanel implements ActionListener{
 			
 		}*/
          if (e.getSource() == downloadButton) {
+        	 String errorMessage = inputVerification() ;
+         	
+         	if (errorMessage!=""){
+	        	 JFrame frame = new JFrame();
+	        	 JOptionPane.showMessageDialog(frame,errorMessage);
+         	}
+         	else{
                     try {
                     	System.out.println("Hi");
                         downloadFromDropBox();
@@ -177,6 +190,7 @@ public class DecryptApp  extends JPanel implements ActionListener{
                         Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
                     } 
                 }
+         }
          }
          
     public DbxClient authenticateDropBox() throws DbxException {
@@ -191,13 +205,55 @@ public class DecryptApp  extends JPanel implements ActionListener{
         return client;
    }
    
+    @SuppressWarnings("deprecation")
+	public String inputVerification() {
+ 	   String text = "";
+ 	   
+ 	   if (textArea.getText().trim().isEmpty()) {
+ 		   text+="- Enter filename to download"+"\n"; 
+ 	   } 
+ 	   
+ 	  if (folderLocationText.getText().trim().isEmpty()) {
+		   text+="- Enter folder location to download from cloud"+"\n"; 
+	   } 
+ 	   	 
+ 	   if ((bg1.getSelection()==null||bg1.getSelection().getActionCommand()== "No") && (bg2.getSelection()==null||bg2.getSelection().getActionCommand()=="No") ){
+ 		 text +="- Please select at least one cloud service"+"\n";
+ 		 return text; 
+ 	   }
+ 	   
+ 	   if (bg1.getSelection()!=null && bg1.getSelection().getActionCommand()== "Yes" ) {
+ 		   if( googleDriveKeyLabel.getText().isEmpty())
+ 				  text+="- Enter Google Drive Token"+"\n";
+ 		   
+ 		  // if( passWordTextArea.getText().isEmpty())
+ 			//	  text+="- Enter Google Drive password"+"\n";
+ 	   }
+ 	  
+ 	   if (bg2.getSelection()!=null && bg2.getSelection().getActionCommand()== "Yes" ) {
+ 		  if( appKeyDropBoxText.getText().isEmpty())
+ 			  text+="- Enter Dropbox Token"+"\n";  
+ 		   		  
+ 	   }
+
+	   if (dowloadLocationText.getText().trim().isEmpty()) {
+			   text+="- Enter local download directory location"+"\n";
+		  }
+	   
+ 	  if (keyText.getText().trim().isEmpty()) {
+		   text+="- Enter Decryption Key";
+	   }
+ 	  
+ 	   return text;
+    }
+    
    public void downloadFromDropBox() throws IOException, DbxException {
 
    	System.out.println("Hi54");
        EncryptDecrypt decryptObj; 
        DbxClient client = authenticateDropBox();
        //Download
-       ArrayList<String> subFileList = download(textArea.getText(), fileDirTextArea.getText(), folderLocationText.getText(), client);
+       ArrayList<String> subFileList = download(textArea.getText(), dowloadLocationText.getText(), folderLocationText.getText(), client);
        
        //Decrypt
         try {
