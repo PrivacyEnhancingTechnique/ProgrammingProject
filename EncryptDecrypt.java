@@ -17,6 +17,14 @@ public class EncryptDecrypt  {
 	KeyGenerator keyGen;
 	SecretKey encrptionKey;
 	
+	public SecretKey getEncrptionKey() {
+		return encrptionKey;
+	}
+
+	public void setEncrptionKey(SecretKey encrptionKey) {
+		this.encrptionKey = encrptionKey;
+	}
+
 	public EncryptDecrypt() throws NoSuchAlgorithmException {
 		this.keyGen =   KeyGenerator.getInstance("DES");
 		keyGen.init(56);
@@ -30,7 +38,7 @@ public class EncryptDecrypt  {
 			File outFile = new File (fileName);
 			encryptDecrypt(Cipher.ENCRYPT_MODE,file,outFile);
 			System.out.println(this.encrptionKey);
-			System.out.println(Base64.getEncoder().encodeToString(this.encrptionKey.getEncoded()));
+			//System.out.println(Base64.getEncoder().encodeToString(this.encrptionKey.getEncoded()));
 			//decryptFile();
 		}
 		else {
