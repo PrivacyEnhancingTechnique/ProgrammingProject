@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,15 +37,15 @@ public class EncryptApp extends JPanel
      JTextArea textArea = new JTextArea();
 	 JLabel numberOfChunks = new JLabel("File Split Count");
 	 JLabel googleDrive = new JLabel("Google Drive Account?");
-	 JLabel userName = new JLabel("Username");
-	 JTextArea userNameTextArea = new JTextArea("me@gmail.com");
-	 JTextArea passWordTextArea = new JTextArea("********");
-	 JLabel passWord = new JLabel("Password");
+	 JLabel googleDriveKeyLabel = new JLabel("Google Drive Token");
+	 JTextArea googleDriveKeyTextArea = new JTextArea("");
+	// JPasswordField passWordTextArea = new JPasswordField();
+	 //JLabel passWord = new JLabel("Password");
 	 JLabel dropBox = new JLabel("Dropbox Account?");
-	 JLabel appKeyDropBox = new JLabel("App Key");
+	 JLabel appKeyDropBox = new JLabel("Dropbox Token");
 	 JTextArea appKeyDropBoxText = new JTextArea("");
 	 JButton uploadButton = new JButton ("Upload");
-         JLabel dropboxDirLabel = new JLabel("Upload Location");
+     JLabel dropboxDirLabel = new JLabel("Dropbox Upload Location");
 	 JTextArea dropboxDirText = new JTextArea("");
 	 SpinnerModel model = new SpinnerNumberModel(1, 0, 20, 1);
 	 JSpinner chunkSize = new JSpinner(model);
@@ -52,6 +53,8 @@ public class EncryptApp extends JPanel
 	 JRadioButton noGoogle = new JRadioButton("No");
 	 JRadioButton yesDropbox = new JRadioButton("Yes");
 	 JRadioButton noDropbox = new JRadioButton("No");
+     ButtonGroup bg1 = new ButtonGroup( );
+     ButtonGroup bg2 = new ButtonGroup( );
      JLabel spacer;
      
 	 public EncryptApp() {
@@ -60,6 +63,12 @@ public class EncryptApp extends JPanel
 		 openButton.addActionListener(this); 
          uploadButton.addActionListener(this); 
 		
+         //set radiobutton
+         yesGoogle.setActionCommand("Yes");
+         noGoogle.setActionCommand("No");
+         yesDropbox.setActionCommand("Yes");
+         noDropbox.setActionCommand("No");
+         
 		//Create the menu bar.  Make it have a green background.
 	     greenMenuBar.setOpaque(true);
 	     greenMenuBar.setPreferredSize(new Dimension(200, 40));
@@ -72,13 +81,13 @@ public class EncryptApp extends JPanel
 		 //TextArea
 		 textArea.setPreferredSize(new Dimension(300, 20));
 	     textArea.setBackground(new Color(250,250,250));
-	     userNameTextArea.setPreferredSize(new Dimension(200, 20));
-	     userNameTextArea.setBackground(new Color(250,250,250));
-	     passWordTextArea.setPreferredSize(new Dimension(200, 20));
-	     passWordTextArea.setBackground(new Color(250,250,250));
-	     appKeyDropBoxText.setPreferredSize(new Dimension(200, 20));
+	     googleDriveKeyTextArea.setPreferredSize(new Dimension(300, 20));
+	     googleDriveKeyTextArea.setBackground(new Color(250,250,250));
+	     //passWordTextArea.setPreferredSize(new Dimension(200, 20));
+	     //passWordTextArea.setBackground(new Color(250,250,250));
+	     appKeyDropBoxText.setPreferredSize(new Dimension(300, 20));
 	     appKeyDropBoxText.setBackground(new Color(250,250,250));
-             dropboxDirText.setPreferredSize(new Dimension(200, 20)); 
+         dropboxDirText.setPreferredSize(new Dimension(300, 20)); 
 	     dropboxDirText.setBackground(new Color(250,250,250));
 	   
 	     
@@ -92,19 +101,18 @@ public class EncryptApp extends JPanel
 		    JPanel buttonPanel = new JPanel();
 	        JPanel tabPanel = new JPanel();
 	        encryptPanel = new JPanel();
-	        
-		    //create menus
-	        encryptPanel.setLayout( null );        
-	        
+	              
+
+	    	encryptPanel.setPreferredSize(new Dimension(700, 300));
 	        tabPanel.setLayout( new BorderLayout() );
-	        buttonPanel.add(textArea);
-	        buttonPanel.add(openButton);
-	        ButtonGroup bg1 = new ButtonGroup( );
-	        ButtonGroup bg2 = new ButtonGroup( );
+	        encryptPanel.add(textArea);
+	        encryptPanel.add(openButton);
 	        
-	        encryptPanel.add(buttonPanel);
+	     //   encryptPanel.add(buttonPanel);
 	        encryptPanel.setLayout(new MigLayout());
 	        encryptPanel.setBackground(new Color(248, 213, 131));
+	        encryptPanel.add(spacer =  new JLabel(" "), "span, grow");
+	        encryptPanel.add(spacer =  new JLabel(" "), "span, grow");
 	        encryptPanel.add(spacer =  new JLabel(" "), "span, grow");
 	        encryptPanel.add(numberOfChunks);
 	        encryptPanel.add(chunkSize);
@@ -116,11 +124,11 @@ public class EncryptApp extends JPanel
 	        encryptPanel.add(yesGoogle);
 	        encryptPanel.add(noGoogle);
 	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-	        encryptPanel.add(userName);
-	        encryptPanel.add(userNameTextArea);
+	        encryptPanel.add(googleDriveKeyLabel);
+	        encryptPanel.add(googleDriveKeyTextArea);
 	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
-	        encryptPanel.add(passWord);
-	        encryptPanel.add(passWordTextArea);
+	       // encryptPanel.add(passWord);
+	       // encryptPanel.add(passWordTextArea);
 	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        encryptPanel.add(spacer=  new JLabel(" "), "span, grow");
 	        encryptPanel.add(dropBox);
@@ -171,21 +179,33 @@ public class EncryptApp extends JPanel
 		}
 	    
                 if (e.getSource() == uploadButton) {
-                    try {
-                        uploadToDropbox();
-                    } catch (IOException ex) {
-                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (DbxException ex) {
-                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvalidKeyException ex) {
-                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                	String errorMessage = inputVerification() ;
+                	
+                	if (errorMessage!=""){
+       	        	 JFrame frame = new JFrame();
+       	        	 JOptionPane.showMessageDialog(frame,errorMessage);
+                	}
+                	else
+                	{
+	                    try {
+	                        uploadToDropbox();
+	                    } catch (IOException ex) {
+	                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
+	                    } catch (DbxException ex) {
+	                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
+	                    } catch (InvalidKeyException ex) {
+	                        Logger.getLogger(MainInterface.class.getName()).log(Level.SEVERE, null, ex);
+	                    } catch (NoSuchAlgorithmException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+                	}
                 }
 	    
 		}
 
-   public void uploadToDropbox() throws IOException, DbxException, InvalidKeyException{
-       EncryptDecrypt encryptObj; 
+   public void uploadToDropbox() throws IOException, DbxException, InvalidKeyException, NoSuchAlgorithmException{
+       EncryptDecrypt encryptObj = new EncryptDecrypt();  
         DbxClient client = authenticateDropBox();
         
         //Split file
@@ -193,11 +213,11 @@ public class EncryptApp extends JPanel
         
         //Encrypt
         try {
-            encryptObj = new EncryptDecrypt();
+            //encryptObj = new EncryptDecrypt();
             for (int index = 0; index < fileList.size(); index++) {
                 encryptObj.encryptFile(fileList.get(index));
             }
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e1) {
+        } catch ( NoSuchPaddingException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
@@ -218,6 +238,10 @@ public class EncryptApp extends JPanel
                 inputStream.close();
             }
         }
+        
+        //Check if upload successful and display key
+        JFrame frame = new JFrame();
+      	JOptionPane.showMessageDialog(frame,"Save key for file decryption"+Base64.getEncoder().encodeToString(encryptObj.getEncrptionKey().getEncoded()));
    }
    
    public static String getFileDirectory(String directory) {
@@ -229,6 +253,38 @@ public class EncryptApp extends JPanel
         }
         return directory;
     }
+   
+   public String inputVerification() {
+	   String text = "";
+	   
+	   if (textArea.getText().trim().isEmpty()) {
+		   text+="- Select file to upload"+"\n"; 
+	   } 
+	   
+	   	   if ((bg1.getSelection()==null||bg1.getSelection().getActionCommand()== "No") && (bg2.getSelection()==null||bg2.getSelection().getActionCommand()=="No") ){
+		 text +="- Please select at least one cloud service"+"\n";
+		 return text; 
+	   }
+	   
+	   if (bg1.getSelection()!=null && bg1.getSelection().getActionCommand()== "Yes" ) {
+		   if( googleDriveKeyTextArea.getText().isEmpty())
+				  text+="- Enter Google Drive Username"+"\n";
+		   
+		  // if( passWordTextArea.getText().isEmpty())
+				//  text+="- Enter Google Drive password"+"\n";
+	   }
+	  
+	   if (bg2.getSelection()!=null && bg2.getSelection().getActionCommand()== "Yes" ) {
+		  if( appKeyDropBoxText.getText().isEmpty())
+			  text+="- Enter dropbox key"+"\n";
+	   
+	   
+		   if (dropboxDirText.getText().trim().isEmpty()) {
+			   text+="- Enter Dropbox upload directory location";
+		   }
+	   }
+	   return text;
+   }
    
    public DbxClient authenticateDropBox() throws DbxException {
        DbxRequestConfig config = new DbxRequestConfig(
