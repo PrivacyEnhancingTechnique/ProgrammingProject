@@ -205,43 +205,49 @@ public class EncryptApp extends JPanel
 		}
 
    public void uploadToDropbox() throws IOException, DbxException, InvalidKeyException, NoSuchAlgorithmException{
-       EncryptDecrypt encryptObj = new EncryptDecrypt();  
-        DbxClient client = authenticateDropBox();
-        
-        //Split file
-        ArrayList<String> fileList = splitFile(fileName, (Integer)model.getValue());
-        
-        //Encrypt
-        try {
-            //encryptObj = new EncryptDecrypt();
-            for (int index = 0; index < fileList.size(); index++) {
-                encryptObj.encryptFile(fileList.get(index));
-            }
-        } catch ( NoSuchPaddingException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-        }
-        
-        //Upload file
-        String directory = getFileDirectory(dropboxDirText.getText());
-
-        //Upload each sub file
-        for (String file : fileList) {
-            File inputFile = new File(file);
-            FileInputStream inputStream = new FileInputStream(inputFile);
-            System.out.print(inputFile.getName());
-            try {
-                DbxEntry.File uploadedFile = client.uploadFile(directory + inputFile.getName(),
-                    DbxWriteMode.add(), inputFile.length(), inputStream);
-                System.out.println("Uploaded: " + uploadedFile.toString());
-            } finally {
-                inputStream.close();
-            }
-        }
-        
-        //Check if upload successful and display key
-        JFrame frame = new JFrame();
-      	JOptionPane.showMessageDialog(frame,"Save key for file decryption"+Base64.getEncoder().encodeToString(encryptObj.getEncrptionKey().getEncoded()));
+		if (fileName.endsWith(".txt")) {
+	       EncryptDecrypt encryptObj = new EncryptDecrypt();  
+	        DbxClient client = authenticateDropBox();
+	        
+	        //Split file
+	        ArrayList<String> fileList = splitFile(fileName, (Integer)model.getValue());
+	        
+	        //Encrypt
+	        try {
+	            //encryptObj = new EncryptDecrypt();
+	            for (int index = 0; index < fileList.size(); index++) {
+	                encryptObj.encryptFile(fileList.get(index));
+	            }
+	        } catch ( NoSuchPaddingException e1) {
+	                // TODO Auto-generated catch block
+	                e1.printStackTrace();
+	        }
+	        
+	        //Upload file
+	        String directory = getFileDirectory(dropboxDirText.getText());
+	
+	        //Upload each sub file
+	        for (String file : fileList) {
+	            File inputFile = new File(file);
+	            FileInputStream inputStream = new FileInputStream(inputFile);
+	            System.out.print(inputFile.getName());
+	            try {
+	                DbxEntry.File uploadedFile = client.uploadFile(directory + inputFile.getName(),
+	                    DbxWriteMode.add(), inputFile.length(), inputStream);
+	                System.out.println("Uploaded: " + uploadedFile.toString());
+	            } finally {
+	                inputStream.close();
+	            }
+	        }
+	        
+	        //Check if upload successful and display key
+	        JFrame frame = new JFrame();
+	      	JOptionPane.showMessageDialog(frame,"Save key below for file decryption \n"+Base64.getEncoder().encodeToString(encryptObj.getEncrptionKey().getEncoded()));
+      	}
+		else {
+			JFrame frame = new JFrame();
+	      	JOptionPane.showMessageDialog(frame,"Upload Failed! File not text file ");
+		}
    }
    
    public static String getFileDirectory(String directory) {
