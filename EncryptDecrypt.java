@@ -1,5 +1,7 @@
 
 import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,7 +34,7 @@ public class EncryptDecrypt  {
 	}
 	
 	public void encryptFile(String fileName) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-		if (fileName.endsWith(".txt")) {
+	
 			//encrypt file
 			File file = new File (fileName);
 			File outFile = new File (fileName);
@@ -40,16 +42,11 @@ public class EncryptDecrypt  {
 			System.out.println(this.encrptionKey);
 			//System.out.println(Base64.getEncoder().encodeToString(this.encrptionKey.getEncoded()));
 			//decryptFile();
-		}
-		else {
-			System.out.println("File not text file");
-			//display pop up saying file not txt file
-		}
+		
 	}
 	
 	public void decryptFile(ArrayList <String> fileNames, String key) {
 		//decrypt file code
-		File outFile = new File ("decrypted.txt");
 		 System.out.println(key);
 	// String encoded = DatatypeConverter.printBase64Binary(key.getBytes());
 	// System.out.println(encoded); 
@@ -60,13 +57,15 @@ public class EncryptDecrypt  {
 		System.out.println(this.encrptionKey);       
                 
 		for(int i=0; i<fileNames.size();i++) {
+			//File outFile = new File (i+"decrypted.txt");
 			File file = new File (fileNames.get(i));
 			System.out.println("Decrypt: "+fileNames.get(i));
-			encryptDecrypt(Cipher.DECRYPT_MODE,file,outFile);
-		}
+			encryptDecrypt(Cipher.DECRYPT_MODE,file,file);
 		
+		}
 	}
 	
+	 
 	private void encryptDecrypt (int cipherMode, File inputFile, File outputFile)  {
         try {
 
