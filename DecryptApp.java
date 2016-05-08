@@ -8,6 +8,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -205,8 +209,7 @@ public class DecryptApp  extends JPanel implements ActionListener{
         return client;
    }
    
-    @SuppressWarnings("deprecation")
-	public String inputVerification() {
+    public String inputVerification() {
  	   String text = "";
  	   
  	   if (textArea.getText().trim().isEmpty()) {
@@ -249,68 +252,85 @@ public class DecryptApp  extends JPanel implements ActionListener{
     
    public void downloadFromDropBox() throws IOException, DbxException {
 
-   	System.out.println("Hi54");
-       EncryptDecrypt decryptObj; 
-       DbxClient client = authenticateDropBox();
-       //Download
-       ArrayList<String> subFileList = download(textArea.getText(), dowloadLocationText.getText(), folderLocationText.getText(), client);
-       
-       //Decrypt
-        try {
-            decryptObj = new EncryptDecrypt();
-            decryptObj.decryptFile(subFileList, keyText.getText());
-        } catch (NoSuchAlgorithmException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-        }
-        
-        //Merge
-        mergeFile(subFileList, textArea.getText(), dowloadLocationText.getText());
-        
-        //Delete
-        deleteFile(subFileList, dowloadLocationText.getText());
-       
+	   if (textArea.getText().endsWith(".txt")||textArea.getText().endsWith(".doc")||textArea.getText().endsWith(".docx")) {
+		  System.out.println("Hi54");
+	       EncryptDecrypt decryptObj; 
+	       DbxClient client = authenticateDropBox();
+	       //Download
+	       ArrayList<String> subFileList = download(textArea.getText(), dowloadLocationText.getText(), folderLocationText.getText(), client);
+	       
+	       if (subFileList.isEmpty())
+	       {
+	    	   JFrame frame = new JFrame();
+	    	   JOptionPane.showMessageDialog(frame," File " +textArea.getText()+" doesn't exist in "+folderLocationText.getText()+" in your cloud directory.\n Please check directory or filename and try again" );
+	       }
+	       else {
+	       //Decrypt
+		        try {
+		            decryptObj = new EncryptDecrypt();
+		            decryptObj.decryptFile(subFileList, keyText.getText());
+		        } catch (NoSuchAlgorithmException e1) {
+		                // TODO Auto-generated catch block
+		                e1.printStackTrace();
+		        }
+		        
+		        //Merge
+		        
+		        mergeFile(subFileList, textArea.getText(), dowloadLocationText.getText());
+		        
+		      //Delete
+		        deleteFile(subFileList, dowloadLocationText.getText());
+		        
+		   	 JFrame frame = new JFrame();
+		   	 JOptionPane.showMessageDialog(frame,"Download complete. Go to "+dowloadLocationText.getText()+" directory to view file");
+		   }
+	   }
+	   else {
+		   JFrame frame = new JFrame();
+		   JOptionPane.showMessageDialog(frame,"Download Failed! File not text file or word document");
+	   }
    }
    
-   public static void deleteFile(ArrayList<String> subFiles, String directory) {
-        for (int index = 0; index < subFiles.size(); index++) {
-            String filePath = directory + subFiles.get(index);
-            System.out.print(filePath);
-            File file = new File(filePath);
-            if(file.delete()){
-                System.out.println(file.getName() + " is deleted successfully!");
-            }else{
-                System.out.println("Failed to delete file.");
-            }
-        }
-    }
-   
-   public static void mergeFile(ArrayList<String> subFiles, String baseFile, String directory) throws IOException {
-        String baseFileNameAndPath = getFileDirectory(directory) + "copy_" + baseFile;
-        BufferedOutputStream outputFile = new BufferedOutputStream(new FileOutputStream(baseFileNameAndPath));
-        for (int subFileIndex = 0; subFileIndex < subFiles.size(); subFileIndex++) {
-            BufferedInputStream inputFile = new BufferedInputStream(
-                    new FileInputStream(subFiles.get(subFileIndex)));
 
-            int b;
-            while ( (b = inputFile.read()) != -1 )
-                    outputFile.write(b);
+	 public static void mergeFile(ArrayList<String> subFiles, String baseFile, String directory) throws IOException {
+	        String baseFileNameAndPath = getFileDirectory(directory)  + baseFile;
+	        BufferedOutputStream outputFile = new BufferedOutputStream(new FileOutputStream(baseFileNameAndPath));
+	        for (int subFileIndex = 0; subFileIndex < subFiles.size(); subFileIndex++) {
+	            BufferedInputStream inputFile = new BufferedInputStream(
+	                    new FileInputStream(subFiles.get(subFileIndex)));
 
-            inputFile.close();
-        }
-            outputFile.close();
-    }
-    
+	            int b;
+	            while ( (b = inputFile.read()) != -1 )
+	                    outputFile.write(b);
+
+	            inputFile.close();
+	        }
+	            outputFile.close();
+	    }
+	 
+	   
    public static String getFileDirectory(String directory) {
         //Add appropriate slash if the directory does not end with one
         if (directory != "/"){
             if (directory.contains("/") && !directory.endsWith("/")) {
-                directory += "//";
+                directory += "/";
             }
         }
         return directory;
     }
    
+   public static void deleteFile(ArrayList<String> subFiles, String directory) {
+       for (int index = 0; index < subFiles.size(); index++) {
+           String filePath = subFiles.get(index);
+           System.out.print(filePath);
+           File file = new File(filePath);
+           if(file.delete()){
+               System.out.println(file.getName() + " is deleted successfully!");
+           }else{
+               System.out.println("Failed to delete file.");
+           }
+       }
+   }
    public static ArrayList<String> download(String file, String localDirectory, String cloudDirectory, DbxClient client) 
             throws IOException, DbxException {
         ArrayList<String> subFileList = new ArrayList<String>();
@@ -353,4 +373,3 @@ public class DecryptApp  extends JPanel implements ActionListener{
         return subFileList;
     }
 }
-
